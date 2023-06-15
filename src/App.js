@@ -119,7 +119,7 @@ function App() {
       url: 'https://judge0-ce.p.rapidapi.com/submissions' + "/" + token,
       params: { base64_encoded: "true", fields: "*" },
       headers: {
-        'X-RapidAPI-Key': '36cc76feb9msh26044f5478f396fp1bd3d1jsn98317e65acef',
+        'X-RapidAPI-Key': '',
         'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
       },
     };
@@ -162,7 +162,7 @@ function App() {
       headers: {
         "content-type": "application/json",
         "Content-Type": "application/json",
-        'X-RapidAPI-Key': '36cc76feb9msh26044f5478f396fp1bd3d1jsn98317e65acef',
+        'X-RapidAPI-Key': '',
         'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
       },
       data: formData,
