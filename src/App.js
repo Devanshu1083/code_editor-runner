@@ -155,31 +155,6 @@ function App() {
       source_code: btoa(userCode),
       stdin: btoa(userInput),
     };
-    const options = {
-      method: "POST",
-      url: 'https://judge0-ce.p.rapidapi.com/submissions',
-      params: { base64_encoded: "true", fields: "*" },
-      headers: {
-        "content-type": "application/json",
-        "Content-Type": "application/json",
-        'X-RapidAPI-Key': '',
-        'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
-      },
-      data: formData,
-    };
-
-    axios
-      .request(options)
-      .then(function (response) {
-        console.log("res.data", response.data);
-        const token = response.data.token;
-        checkStatus(token);
-      })
-      .catch((err) => {
-        let error = err.response ? err.response.data : err;
-        setLoading(false);
-        console.log(error);
-      });
 	  }; 
 
 	  const clearOutput=()=>{
