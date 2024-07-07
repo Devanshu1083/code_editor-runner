@@ -37,7 +37,7 @@ const OutputWindow = ({ outputDetails }) => {
   };
   return (
     <>
-      <div className="output-box">
+      <div className="output-box1">
         {outputDetails ? <>{getOutput()}</> : null}
       </div>
     </>

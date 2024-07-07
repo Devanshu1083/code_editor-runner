@@ -1,15 +1,15 @@
-import React,{ useState } from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import Select from 'react-select';
 import CodeEditorWindow from './Components/CodeEditorWindow';
 import axios from 'axios';
 import OutputWindow from './Components/OutputWindow';
 import OutputDetails from './Components/OutputDetails';
-import {SelectStyle} from './utility/SelectStyle';
+import { SelectStyle } from './utility/SelectStyle';
 import lgo from './lgo.png';
 function App() {
 
-	const languages = [
+  const languages = [
     {
       id: 70,
       name: "Python (2.7.17)",
@@ -76,51 +76,51 @@ function App() {
       label: "Java (OpenJDK 13.0.1)",
       value: "java",
     },
-    ];
-	const themes = [
-        { value: "vs-dark", label: "Dark" },
-        { value: "light", label: "Light" },
-    ]
-	// State variable to set users source code
-    const [userCode, setUserCode] = useState("#Enter code here");
- 
-    // State variable to set editors default language
-    const [userLang, setUserLang] = useState(languages[1]);
- 
-    // State variable to set editors default theme
-    const [userTheme, setUserTheme] = useState("vs-dark");
- 
-    // State variable to set users input
-    const [userInput, setUserInput] = useState("");
- 
-    // State variable to set users output
-    const [userOutput, setUserOutput] = useState("");
-    
-    const [outputDetails,setoutputDetails]=useState(null);
-    // Loading state variable to show spinner
-    // while fetching data
-    const [loading, setLoading] = useState(false);
-    
-	const onChange = (action, data) => {
-		switch (action) {
-		  case "code": {
-			setUserCode(data);
-			break;
-		  }
-		  default: {
-			console.warn("case not handled!", action, data);
-		  }
-		}
-	  };
+  ];
+  const themes = [
+    { value: "vs-dark", label: "Dark" },
+    { value: "light", label: "Light" },
+  ]
+  // State variable to set users source code
+  const [userCode, setUserCode] = useState("#Enter code here");
+
+  // State variable to set editors default language
+  const [userLang, setUserLang] = useState(languages[1]);
+
+  // State variable to set editors default theme
+  const [userTheme, setUserTheme] = useState("vs-dark");
+
+  // State variable to set users input
+  const [userInput, setUserInput] = useState("");
+
+  // State variable to set users output
+  const [userOutput, setUserOutput] = useState("");
+
+  const [outputDetails, setoutputDetails] = useState(null);
+  // Loading state variable to show spinner
+  // while fetching data
+  const [loading, setLoading] = useState(false);
+
+  const onChange = (action, data) => {
+    switch (action) {
+      case "code": {
+        setUserCode(data);
+        break;
+      }
+      default: {
+        console.warn("case not handled!", action, data);
+      }
+    }
+  };
 
   const checkStatus = async (token) => {
     const options = {
       method: "GET",
-      url: 'https://judge0-ce.p.rapidapi.com/submissions' + "/" + token,
+      url: `https://${process.env.REACT_APP_API_HOST}/submissions` + "/" + token,
       params: { base64_encoded: "true", fields: "*" },
       headers: {
-        'X-RapidAPI-Key': '',
-        'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com'
+        'X-RapidAPI-Key': process.env.REACT_APP_API_KEY,
+        'X-RapidAPI-Host': process.env.REACT_APP_API_HOST
       },
     };
     try {
@@ -146,90 +146,114 @@ function App() {
       setLoading(false);
     }
   };
-	const compile =()=>{
+  const compile = () => {
     setLoading(true);
-
-     const formData = {
+    const formData = {
       language_id: userLang.id,
       // encode source code in base64
       source_code: btoa(userCode),
       stdin: btoa(userInput),
     };
-	  }; 
+    const options = {
+      method: "POST",
+      url: `https://${process.env.REACT_APP_API_HOST}/submissions`,
+      params: { base64_encoded: "true", fields: "*" },
+      headers: {
+        "content-type": "application/json",
+        "Content-Type": "application/json",
+        'X-RapidAPI-Key': process.env.REACT_APP_API_KEY,
+        'X-RapidAPI-Host': process.env.REACT_APP_API_HOST
+      },
+      data: formData,
+    };
 
-	  const clearOutput=()=>{
-      setoutputDetails(null);
-      setUserOutput("");
-	  }
+    axios
+      .request(options)
+      .then(function (response) {
+        console.log("res.data", response.data);
+        const token = response.data.token;
+        checkStatus(token);
+      })
+      .catch((err) => {
+        let error = err.response ? err.response.data : err;
+        setLoading(false);
+        console.log(error);
+      });
+  };
 
-	  return (
-		<div id="home">
-    <div id="nav-box">
-		<nav id="navbar">
-            <Select className='nav-items' 
-            options={languages} 
+  const clearOutput = () => {
+    setoutputDetails(null);
+    setUserOutput("");
+  }
+
+  return (
+    <div id="home">
+      <div id="nav-box">
+        <nav id="navbar">
+          <img src={lgo} alt='DEV-L'></img>
+          <div id='menu'>
+          <Select className='nav-items'
+            options={languages}
             value={userLang}
             onChange={(e) => setUserLang(e)}
             placeholder={userLang}
             styles={SelectStyle} />
 
-            <Select className='nav-items' 
+          <Select className='nav-items'
             options={themes} value={userTheme}
             onChange={(e) => setUserTheme(e.value)}
-            placeholder={userTheme} 
-            styles={SelectStyle}/>
-            <img src={lgo} alt='DEV-L'></img>
-		</nav>
-    <div className="backgrnd">
-    </div>
-    </div>
-    <div className='windows'>
-		<div className='left-container'>
-		  <CodeEditorWindow id="editor-box"
-		  language={userLang?.value}
-		  theme={userTheme}
-		  code={userCode}
-          onChange={onChange}
-		   />
-		</div>
-		<div className="right-container">
-                    <div className='input-label'>
-                      INPUT:
-                    </div>
-                    <div className="input-box">
-                        <textarea id="code-inp" onChange=
-                            {(e) => setUserInput(e.target.value)}>
-                        </textarea>
-                    </div>
-                    <div className='input-label2'>
-                      OUTPUT:
-                    </div>
-                    {loading ? (
-                        <div className="spinner-box">
-                          <div class="lds-dual-ring"></div>
-                        </div>
-                    ) : (
-                      <div className="output-box">
-                        <OutputWindow outputDetails={outputDetails}></OutputWindow>
-                        {outputDetails && <OutputDetails outputDetails={outputDetails} />}
-                      </div>              
-                    )}
-                     <div className="btns">
-                            <div >
-                               <div className="btn btn-one" onClick={() => compile()}>
-                               <span className="box-1" >SUBMIT</span>
-                              </div>
-                            </div>
-                            <div >
-                               <div className="btn btn-one" onClick={() => clearOutput()}>
-                               <span className="box-1" >CLEAR</span>
-                              </div>
-                            </div>
-                    </div>
+            placeholder={userTheme}
+            styles={SelectStyle} />
           </div>
-		 </div>
-		</div>
-	  )
+        </nav>
+      </div>
+      <div className='windows'>
+        <div className='left-container'>
+          <CodeEditorWindow id="editor-box"
+            language={userLang?.value}
+            theme={userTheme}
+            code={userCode}
+            onChange={onChange}
+          />
+        </div>
+        <div className="right-container">
+          <div className='input-label'>
+            INPUT:
+          </div>
+          <div className="input-box">
+            <textarea id="code-inp" onChange=
+              {(e) => setUserInput(e.target.value)}>
+            </textarea>
+          </div>
+          <div className='input-label2'>
+            OUTPUT:
+          </div>
+          {loading ? (
+            <div className="spinner-box">
+              <div className="lds-dual-ring"></div>
+            </div>
+          ) : (
+            <div className="output-box">
+              <OutputWindow outputDetails={outputDetails}></OutputWindow>
+              {outputDetails && <OutputDetails outputDetails={outputDetails} />}
+            </div>
+          )}
+          <div className="btns">
+            <div >
+              <div className="btn btn-one" onClick={() => compile()}>
+                <span className="box-1" >SUBMIT</span>
+              </div>
+            </div>
+            <div >
+              <div className="btn btn-one" onClick={() => clearOutput()}>
+                <span className="box-1" >CLEAR</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default App;

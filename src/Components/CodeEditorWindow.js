@@ -12,15 +12,17 @@ const CodeEditorWindow = ({ language, code, theme,onChange }) => {
 
   return (
     <div className="code-editr">
+      <div className="border">
       <Editor
         height="82vh"
-        width={`95%`}
+        width={`100%`}
         language={language || "python"}
         value={value}//the code user enters
         theme={theme}
         defaultValue="# Enter code Here"
         onChange={handleEditorChange}
       />
+      </div>
     </div>
   );
 };
